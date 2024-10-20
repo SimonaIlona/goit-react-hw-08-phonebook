@@ -1,20 +1,17 @@
 import React from 'react';
-import ReactDOM from 'react-dom/client';
-import { App } from 'components/App';
-import './index.css';
-import { BrowserRouter } from 'react-router-dom';
+import { createRoot } from 'react-dom/client';
+import { ChakraProvider } from '@chakra-ui/react';
 import { Provider } from 'react-redux';
-import { PersistGate } from 'redux-persist/integration/react';
-import { store, persistor } from 'store';
+import store from 'reduxtoolkit/store';
+import App from './components/App';
+import './index.css';
 
-ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
+const root = createRoot(document.getElementById('root'));
+
+root.render(
+  <ChakraProvider>
     <Provider store={store}>
-      <PersistGate loading={null} persistor={persistor}>
-        <BrowserRouter basename="/goit-react-hw-08-phonebook">
-          <App />
-        </BrowserRouter>
-      </PersistGate>
+      <App />
     </Provider>
-  </React.StrictMode>
+  </ChakraProvider>
 );

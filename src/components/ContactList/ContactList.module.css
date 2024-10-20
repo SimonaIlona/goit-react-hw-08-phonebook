@@ -1,0 +1,11 @@
+.container {
+  color: red;
+  display: flex;
+  font-size: 12px;
+  gap: 1rem;
+}
+
+.contactList {
+  padding: 0;
+  display: flex;
+}

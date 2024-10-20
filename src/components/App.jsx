@@ -1,55 +1,49 @@
-import { lazy } from 'react';
-import { Route, Routes } from 'react-router-dom';
-import { RestrictedRoute } from './RestrictedRoute';
-import { PrivateRoute } from './PrivateRoute';
-import { refreshUser } from 'features/auth/operations';
-import { useDispatch } from 'react-redux';
-import { useEffect } from 'react';
-import { useAuth } from 'hooks';
-import SharedLayout from './shared-layout/SharedLayout';
-import Loading from './loading/Loading';
+import React from 'react';
+import {
+  HashRouter as Router,
+  Route,
+  Routes,
+  Navigate,
+} from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { Box } from '@chakra-ui/react';
+import UserMenu from './UserMenu/UserMenu';
+import Navigation from './Navigation/Navigation';
+import Contacts from 'pages/Contacts/Contacts';
+import Register from 'pages/Register/Register';
+import Login from 'pages/Login/Login';
 
-const HomePage = lazy(() => import('./pages/home-page/HomePage'));
-const Register = lazy(() => import('./pages/register/Register'));
-const Login = lazy(() => import('./pages/login/Login'));
-const Contacts = lazy(() => import('./pages/contacts/Contacts'));
-const ErrorPage = lazy(() => import('./pages/error-page/ErrorPage'));
+const App = () => {
+  const isAuthenticated = useSelector(state => state.auth.isAuthenticated);
 
-export const App = () => {
-  const { isRefreshing } = useAuth();
-  const dispatch = useDispatch();
-  useEffect(() => {
-    dispatch(refreshUser());
-  }, [dispatch]);
-
-  return isRefreshing ? (
-    <div className="loading-container">
-      <Loading />
-    </div>
-  ) : (
-    <Routes>
-      <Route path="/" element={<SharedLayout />}>
-        <Route index element={<HomePage />} />
-        <Route
-          path="/register"
-          element={
-            <RestrictedRoute redirectTo="/contacts" component={<Register />} />
-          }
-        />
-        <Route
-          path="/login"
-          element={
-            <RestrictedRoute redirectTo="/contacts" component={<Login />} />
-          }
-        />
-        <Route
-          path="/contacts"
-          element={
-            <PrivateRoute redirectTo="/register" component={<Contacts />} />
-          }
-        />
-        <Route path="*" element={<ErrorPage />} />
-      </Route>
-    </Routes>
+  return (
+    <Router>
+      <Box p={4}>
+        <Navigation />
+        {isAuthenticated && <UserMenu />}
+        <Routes>
+          <Route
+            path="/register"
+            element={
+              isAuthenticated ? <Navigate to="/contacts" /> : <Register />
+            }
+          />
+          <Route
+            path="/login"
+            element={isAuthenticated ? <Navigate to="/contacts" /> : <Login />}
+          />
+          <Route
+            path="/contacts"
+            element={isAuthenticated ? <Contacts /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="*"
+            element={<Navigate to={isAuthenticated ? '/contacts' : '/login'} />}
+          />
+        </Routes>
+      </Box>
+    </Router>
   );
 };
+
+export default App;
